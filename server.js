@@ -11,13 +11,17 @@ const app = express();
 app.use(express.static('public'));
 
 app.get('/api/notes', (req, res) => {
-  res.json(data);
+  const filteredData = data.filter(item => item.title.includes(req.query.searchTerm));
+  if(!data) {
+    return res.sendStatus(404);
+  }
+  return res.json(filteredData);
 });
 
 app.get('/api/notes/:id', (req, res) => {
   const note = data.find(item => item.id === Number(req.params.id));
   if(!data) {
-    return res.send('Failed');
+    return res.sendStatus(404);
   }
   return res.send(note);
 })
