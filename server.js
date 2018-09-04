@@ -11,11 +11,11 @@ const app = express();
 app.use(express.static('public'));
 
 app.get('/api/notes', (req, res) => {
-  const filteredData = data.filter(item => item.title.includes(req.query.searchTerm));
-  if(!data) {
-    return res.sendStatus(404);
-  }
-  return res.json(filteredData);
+  const searchTerm = req.query.searchTerm;
+  if(searchTerm) {
+      let filteredData = data.filter(item => item.title.includes(req.query.searchTerm));
+      return res.json(filteredData);
+    } else return res.json(data);
 });
 
 app.get('/api/notes/:id', (req, res) => {
