@@ -6,30 +6,35 @@ const express = require('express');
 const morgan = require('morgan');
 const { logOut } = require('./middleware/logger');
 const data = require('./db/notes');
+const simDB = require('./db/simDB');
+const notes = simDB.initialize(data);
 const { PORT } = require('./config');
 
 const app = express();
 
 app.use(express.static('public'));
 app.use(logOut);
-app.get('/api/notes', (req, res) => {
-  const searchTerm = req.query.searchTerm;
-  if(searchTerm) {
-      let filteredData = data.filter(item => item.title.includes(req.query.searchTerm));
-      return res.json(filteredData);
-    } else return res.json(data);
+
+app.get('/api/notes', (req, res, next) => {
+  const { searchTerm } = req.query;
+
+  notes.filter(searchTerm, (err, list) => {
+    if (err) {
+      return next(err);
+    }
+    res.json(list);
+  });
 });
 
 app.get('/api/notes/:id', (req, res) => {
-  const note = data.find(item => item.id === Number(req.params.id));
-  if(!data) {
-    return res.sendStatus(404);
-  }
-  return res.send(note);
-})
+  const noteId = req.params.id;
 
-app.get('/boom', (req, res, next) => {
-  throw new Error('Boom!!');
+  notes.find(noteId, (err, list) => {
+    if(err) {
+      return next(err);
+    }
+    res.json(list);
+  });
 });
 
 app.use(function (req, res, next) {
