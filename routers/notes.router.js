@@ -75,4 +75,27 @@ NotesRouter.post('/', (req, res, next) => {
   });
 });
 
+NotesRouter.delete('/:id', (req, res, next) => {
+  const noteId = req.params.id;
+
+  notes.delete(noteId, err => {
+    console.log('1');
+    if(err) {
+      console.log('2');
+      const err = new Error(`Missing 'title' in request body`);
+      err.status = 500;
+      return next(err);
+    }
+    if(noteId) {
+      console.log('3');
+      const err = new Error(`Missing 'title' in request body`);
+      err.status = 204;
+      return next(err);
+    }else {
+      console.log('4');
+      next();
+    }
+  });
+});
+
 module.exports = NotesRouter;
