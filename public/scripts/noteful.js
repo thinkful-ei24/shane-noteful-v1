@@ -30,6 +30,7 @@ const noteful = (function () {
    */
   function getNoteIdFromElement(item) {
     const id = $(item).closest('.js-note-element').data('id');
+    console.log('getNoteId', id);
     return id;
   }
 
@@ -41,11 +42,14 @@ const noteful = (function () {
       event.preventDefault();
 
       const noteId = getNoteIdFromElement(event.currentTarget);
-
-      api.details(noteId, detailsResponse => {
-        store.currentNote = detailsResponse;
-        render();
-      });
+      console.log(noteId, 'wtf');
+      api.details(noteId)
+        .then(detailsResponse => {
+          console.log('api.details', noteId);
+          store.currentNote = detailsResponse;
+          console.log(store.currentNote);
+          render();
+        });
 
     });
   }
@@ -57,11 +61,11 @@ const noteful = (function () {
       const searchTerm = $('.js-note-search-entry').val();
       store.currentSearchTerm = searchTerm ? { searchTerm } : {};
 
-      api.search(store.currentSearchTerm, searchResponse => {
-        store.notes = searchResponse;
-        render();
-      });
-
+      api.search(store.currentSearchTerm)
+        .then(searchResponse => {
+          store.notes = searchResponse;
+          render();
+        });
     });
   }
 
@@ -79,27 +83,46 @@ const noteful = (function () {
 
       if (noteObj.id) {
 
-        api.update(store.currentNote.id, noteObj, updateResponse => {
-          store.currentNote = updateResponse;
-
-          api.search(store.currentSearchTerm, searchResponse => {
+        api.update(store.currentNote.id, noteObj)
+          .then(updateResponse => {
+            store.currentNote = updateResponse;
+            return api.search(store.currentSearchTerm);
+          })
+          .then(searchResponse => {
             store.notes = searchResponse;
             render();
           });
 
-        });
+        // api.update(store.currentNote.id, noteObj, updateResponse => {
+        //   store.currentNote = updateResponse;
+
+        //   api.search(store.currentSearchTerm, searchResponse => {
+        //     store.notes = searchResponse;
+        //     render();
+        //   });
+
+        // });
 
       } else {
 
-        api.create(noteObj, createResponse => {
-          store.currentNote = createResponse;
-
-          api.search(store.currentSearchTerm, searchResponse => {
+        api.create(noteObj)
+          .then(createResponse => {
+            store.currentNote = createResponse;
+            return api.search(store.currentSearchTerm)
+          })
+          .then(searchResponse => {
             store.notes = searchResponse;
             render();
           });
 
-        });
+        // api.create(noteObj, createResponse => {
+        //   store.currentNote = createResponse;
+
+        //   api.search(store.currentSearchTerm, searchResponse => {
+        //     store.notes = searchResponse;
+        //     render();
+        //   });
+        // });
       }
 
     });
@@ -121,17 +144,18 @@ const noteful = (function () {
 
       const noteId = getNoteIdFromElement(event.currentTarget);
 
-      api.remove(noteId, () => {
+        api.remove(noteId)
+          .then(() => {
+            api.search(store.currentSearchTerm)
+              .then(searchResponse => {
+                store.notes = searchResponse;
+                if(noteId === store.currentNote.id) {
+                  store.currentNote = {};
+                }
+                render();
+              })
+          });
 
-        api.search(store.currentSearchTerm, searchResponse => {
-          store.notes = searchResponse;
-          if (noteId === store.currentNote.id) {
-            store.currentNote = {};
-          }
-
-          render();
-        });
-      });
     });
   }
 

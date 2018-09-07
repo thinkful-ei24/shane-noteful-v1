@@ -26,10 +26,10 @@ NotesRouter.get('/', (req, res, next) => {
 NotesRouter.get('/:id', (req, res, next) => {
   const noteId = req.params.id;
 
-  notes.find(id)
-    .then(list => {
+  notes.find(noteId)
+    .then(item => {
       if(item){
-        res.json(list);
+        res.json(item);
       } else {
         next();
       }
