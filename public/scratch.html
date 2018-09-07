@@ -49,32 +49,15 @@
     Footer
   </footer>
 
-  <script type="text/javascript" src="//code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
-    crossorigin="anonymous"></script>
+  <script
+			  src="https://code.jquery.com/jquery-3.3.1.js"
+			  integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+			  crossorigin="anonymous"></script>
 
   <script type="text/javascript" src="scripts/api.js"></script>
   <script type="text/javascript" src="scripts/store.js"></script>
   <script type="text/javascript" src="scripts/noteful.js"></script>
   <script type="text/javascript" src="scripts/index.js"></script>
-
-
-
-  <script>
-      // test get all
-      api.search({})
-        .then(response => {
-          console.log("test1", response)
-        });
-
-      // test get all with search term
-      api.search({searchTerm: 'life'})
-        .then(response => {
-          console.log("test2", response)
-        });
-    </script>
-
-
-
 </body>
 
 </html>
