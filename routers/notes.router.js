@@ -8,23 +8,35 @@ const NotesRouter = express.Router();
 NotesRouter.get('/', (req, res, next) => {
   const { searchTerm } = req.query;
 
-  notes.filter(searchTerm, (err, list) => {
-    if(err) {
+  notes.filter(searchTerm)
+    .then(list => {
+      console.log(searchTerm);
+      if(list){
+        res.json(list);
+      } else {
+        next();
+      }
+    })
+    .catch(err => {
       return next(err);
-    }
-    res.json(list);
   });
 });
+
 
 NotesRouter.get('/:id', (req, res, next) => {
   const noteId = req.params.id;
 
-  notes.find(noteId, (err, list) => {
-    if(err) {
+  notes.find(noteId)
+    .then(item => {
+      if(item){
+        res.json(item);
+      } else {
+        next();
+      }
+    })
+    .catch(err => {
       return next(err);
-    }
-    res.json(list);
-  });
+    });
 });
 
 NotesRouter.put('/:id', (req, res, next) => {
@@ -39,16 +51,17 @@ NotesRouter.put('/:id', (req, res, next) => {
     }
   });
 
-  notes.update(id, updateObj, (err, item) => {
-    if(err) {
+  notes.update(id, updateObj)
+    .then(item => {
+      if(item) {
+        res.json(item);
+      } else {
+        next();
+      }
+    })
+    .catch(err => {
       return next(err);
-    }
-    if(item) {
-      res.json(item);
-    } else {
-      next();
-    }
-  });
+    })
 });
 
 NotesRouter.post('/', (req, res, next) => {
@@ -63,27 +76,29 @@ NotesRouter.post('/', (req, res, next) => {
     return next(err);
   }
 
-  notes.create(newItem, (err, item) => {
-    if(err) {
+  notes.create(newItem)
+    .then((item) => {
+      if(item) {
+        res.location();
+      } else {
+        next();
+      }
+    })
+    .catch((err) => {
       return next(err);
-    }
-    if(item) {
-      res.location(`http://${req.headers.host}/notes/${item.id}`).status(201).json(item);
-    } else {
-      next();
-    }
   });
 });
 
 NotesRouter.delete('/:id', (req, res, next) => {
   const noteId = req.params.id;
 
-  notes.delete(noteId, (err) => {
-    if(err) {
+  notes.delete(noteId)
+    .then(noteId => {
+      res.sendStatis(204);
+    })
+    .catch(err => {
       return next(err);
-    }
-    res.sendStatus(204);
-  });
+    });
 });
 
 module.exports = NotesRouter;
